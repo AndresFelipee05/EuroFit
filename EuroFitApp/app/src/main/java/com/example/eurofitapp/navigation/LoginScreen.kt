@@ -132,4 +132,55 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.weight(1f))
     }
+
+    // Diálogo para cambiar la contraseña
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Cambiar contraseña", color = textColor) },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = newPassword,
+                        onValueChange = { newPassword = it },
+                        label = { Text("Nueva contraseña", color = textColor) },
+                        visualTransformation = if (newPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        singleLine = true,
+                        trailingIcon = {
+                            IconButton(onClick = { newPasswordVisible = !newPasswordVisible }) {
+                                Icon(
+                                    imageVector = if (newPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                    contentDescription = if (newPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                                    tint = textColor
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    if (newPassword.isNotEmpty()) {
+                        storedPassword = newPassword
+                        showDialog = false
+                        newPassword = ""
+                        errorMessage = "Contraseña cambiada exitosamente."
+                    } else {
+                        errorMessage = "La nueva contraseña no puede estar vacía."
+                    }
+                }) {
+                    Text("Confirmar", color = textColor)
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("Cancelar", color = textColor)
+                }
+            },
+            containerColor = backgroundColor, // Fondo del diálogo
+            textContentColor = textColor // Color del texto del diálogo
+        )
+    }
 }

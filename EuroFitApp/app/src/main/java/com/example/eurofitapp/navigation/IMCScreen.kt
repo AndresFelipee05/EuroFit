@@ -89,7 +89,7 @@ fun getIMCCategory(imc: Float): IMCCategory {
     return when {
         imc < 18.5 -> IMCCategory("Bajo peso", Color.Red)
         imc < 24.9 -> IMCCategory("Peso normal", Color.Green)
-        imc < 29.9 -> IMCCategory("Sobrepeso", Color.Green)
+        imc < 29.9 -> IMCCategory("Sobrepeso", Color.Magenta)
         else -> IMCCategory("Obesidad", Color.Red)
     }
 }
