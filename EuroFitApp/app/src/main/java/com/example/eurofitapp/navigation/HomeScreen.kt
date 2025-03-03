@@ -43,18 +43,6 @@ fun HomeScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Switch para activar/desactivar el modo oscuro
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "Modo Oscuro", modifier = Modifier.weight(1f))
-                Switch(
-                    checked = isDarkMode,
-                    onCheckedChange = { isDarkMode = it }
-                )
-            }
-
             Spacer(modifier = Modifier.height(16.dp))
 
             // Fila para el título y el ícono de impresión
@@ -65,9 +53,13 @@ fun HomeScreen(
                 // Espacio flexible para centrar el título
                 Spacer(modifier = Modifier.weight(1f))
 
-                Text(text = "HOME SCREEN", fontSize = 25.sp)
+                Text(text = "INTRODUCE DATOS", fontSize = 25.sp)
 
                 Spacer(modifier = Modifier.weight(1f)) // Espacio flexible para empujar el ícono a la derecha
+                Switch(
+                    checked = isDarkMode,
+                    onCheckedChange = { isDarkMode = it }
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -89,7 +81,12 @@ fun HomeScreen(
                 onValueChange = { newValue ->
                     weight = newValue.filter { it.isDigit() || it == '.' || it == ',' }
                         .replace(',', '.')
-                        .let { filtered -> if (filtered.count { it == '.' } > 1) filtered.substring(0, filtered.lastIndexOf('.') + 1) else filtered }
+                        .let { filtered ->
+                            if (filtered.count { it == '.' } > 1) filtered.substring(
+                                0,
+                                filtered.lastIndexOf('.') + 1
+                            ) else filtered
+                        }
                 },
                 label = { Text("Peso") },
                 placeholder = { Text("Introduce tu peso (ej. 70.5)") },
@@ -104,7 +101,12 @@ fun HomeScreen(
                 onValueChange = { newValue ->
                     height = newValue.filter { it.isDigit() || it == '.' || it == ',' }
                         .replace(',', '.')
-                        .let { filtered -> if (filtered.count { it == '.' } > 1) filtered.substring(0, filtered.lastIndexOf('.') + 1) else filtered }
+                        .let { filtered ->
+                            if (filtered.count { it == '.' } > 1) filtered.substring(
+                                0,
+                                filtered.lastIndexOf('.') + 1
+                            ) else filtered
+                        }
                 },
                 label = { Text("Altura") },
                 placeholder = { Text("Introduce tu altura (ej. 1.75)") },

@@ -1,19 +1,11 @@
 package com.example.eurofitapp.navigation
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +18,7 @@ fun IMCScreen(
     navigateToHome: () -> Unit // Función para navegar a HomeScreen
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) } // Estado para controlar el diálogo
+    val imcCategory = getIMCCategory(imc) // Obtener la categoría del IMC
 
     Column(
         modifier = Modifier
@@ -34,7 +27,15 @@ fun IMCScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(200.dp))
+
+        // Mostrar IMC y su categoría con color correspondiente
         Text(text = "Tu IMC es: ${"%.2f".format(imc)}", fontSize = 24.sp)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = imcCategory.text,
+            fontSize = 20.sp,
+            color = imcCategory.color
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -82,3 +83,16 @@ fun IMCScreen(
         )
     }
 }
+
+// 🔹 Función para obtener la categoría del IMC y el color asociado
+fun getIMCCategory(imc: Float): IMCCategory {
+    return when {
+        imc < 18.5 -> IMCCategory("Bajo peso", Color.Red)
+        imc < 24.9 -> IMCCategory("Peso normal", Color.Green)
+        imc < 29.9 -> IMCCategory("Sobrepeso", Color.Green)
+        else -> IMCCategory("Obesidad", Color.Red)
+    }
+}
+
+// 🔹 Clase de datos para manejar la categoría del IMC y su color
+data class IMCCategory(val text: String, val color: Color)

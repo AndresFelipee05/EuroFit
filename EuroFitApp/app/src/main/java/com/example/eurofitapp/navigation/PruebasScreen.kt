@@ -163,8 +163,7 @@ fun PruebasScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(5.dp))
-        Text(text = "Pruebas", fontSize = 25.sp)
-        Text(text = "Aquí se muestran las pruebas junto a su foto")
+        Text(text = "PRUEBAS", fontSize = 25.sp)
         Spacer(modifier = Modifier.height(16.dp))
 
         // Mostrar un mensaje si el usuario es menor de 14 años
