@@ -1,4 +1,6 @@
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -10,18 +12,26 @@ import com.example.eurofitapp.navigation.LanzarMujerScreen
 import com.example.eurofitapp.navigation.LoginScreen
 import com.example.eurofitapp.navigation.NotaScreen
 import com.example.eurofitapp.navigation.PruebasScreen
+import com.example.eurofitapp.navigation.ThemeViewModel
 import com.example.eurofitapp.navigation.VelocidadHombreScreen
 import com.example.eurofitapp.navigation.VelocidadMujerScreen
 import com.example.eurofitapp.screens.*
 
 @Composable
-fun NavigationWrapper() {
+fun NavigationWrapper(themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
+
+    // Observa el valor de isDarkMode usando collectAsState
+    val isDarkMode by themeViewModel.isDarkMode.collectAsState(initial = false)
 
     NavHost(navController = navController, startDestination = "login") {
         // Pantalla Login
         composable("login") {
-            LoginScreen { navController.navigate("home") }
+            LoginScreen(
+                navigateToHome = { navController.navigate("home") },
+                themeViewModel = themeViewModel, // Pasamos el ViewModel
+                isDarkMode = isDarkMode // Pasamos el estado de isDarkMode
+            )
         }
 
         // Pantalla Home
@@ -33,9 +43,14 @@ fun NavigationWrapper() {
                 navigateToLogin = { navController.navigate("login") },
                 navigateToIMC = { imc ->
                     navController.navigate("imc_screen/$imc")
+                },
+                isDarkMode = isDarkMode, // Pasar el valor de isDarkMode observado
+                onDarkModeToggle = { newDarkModeState ->
+                    themeViewModel.setDarkMode(newDarkModeState) // Actualizar el estado en el ViewModel
                 }
             )
         }
+
 
         // Pantalla Pruebas con parámetros de edad y sexo
         composable("pruebas/{age}/{sex}") { backStackEntry ->

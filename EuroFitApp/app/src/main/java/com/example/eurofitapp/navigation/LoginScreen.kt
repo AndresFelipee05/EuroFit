@@ -1,5 +1,6 @@
 package com.example.eurofitapp.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -18,43 +19,64 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun LoginScreen(navigateToHome: () -> Unit) {
+fun LoginScreen(
+    navigateToHome: () -> Unit,
+    themeViewModel: ThemeViewModel,  // Pasamos el ViewModel aquí
+    isDarkMode: Boolean  // Usamos el valor de isDarkMode aquí
+) {
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    var passwordVisible by rememberSaveable { mutableStateOf(false) } // Estado para ver/ocultar contraseña
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
     var errorMessage by rememberSaveable { mutableStateOf("") }
 
-    // Estado mutable para el usuario y contraseña
     var storedUsername by rememberSaveable { mutableStateOf("root") }
     var storedPassword by rememberSaveable { mutableStateOf("root") }
 
-    // Controla si se muestra el diálogo de cambio de contraseña
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var newPassword by rememberSaveable { mutableStateOf("") }
-    var newPasswordVisible by rememberSaveable { mutableStateOf(false) } // Estado para ver/ocultar nueva contraseña
+    var newPasswordVisible by rememberSaveable { mutableStateOf(false) }
+
+    // El valor de isDarkMode ya está pasado desde NavigationWrapper
+    val backgroundColor = if (isDarkMode) Color.Black else Color.White
+    val textColor = if (isDarkMode) Color.White else Color.Black
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backgroundColor)
+            .padding(16.dp), // Agregamos padding general
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.weight(1f))
-        Text(text = "INICIAR SESIÓN", fontSize = 25.sp)
+        // Título y Switch en la misma fila bien alineados
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp), // Espaciado
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "INICIAR SESIÓN", fontSize = 25.sp, color = textColor)
+            Switch(
+                checked = isDarkMode,
+                onCheckedChange = { themeViewModel.toggleTheme() } // Cambiamos el tema desde aquí
+            )
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo de usuario
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text("Usuario") },
-            singleLine = true
+            label = { Text("Usuario", color = textColor) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo de contraseña con opción de ver/ocultar
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Contraseña") },
+            label = { Text("Contraseña", color = textColor) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
@@ -62,93 +84,52 @@ fun LoginScreen(navigateToHome: () -> Unit) {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
                         imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                        contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                        tint = textColor
                     )
                 }
-            }
+            },
+            modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Mostrar mensaje de error si las credenciales son incorrectas
         if (errorMessage.isNotEmpty()) {
             Text(text = errorMessage, color = Color.Red)
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // 🔹 Botones en la misma fila con espacio entre ellos
-        Row {
-            Button(onClick = {
-                if (username == storedUsername && password == storedPassword) {
-                    errorMessage = ""
-                    navigateToHome()
-                } else {
-                    errorMessage = "Usuario o contraseña incorrectos."
+        // Centrar los botones correctamente
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Row {
+                Button(onClick = {
+                    if (username == storedUsername && password == storedPassword) {
+                        errorMessage = ""
+                        navigateToHome() // Navega a la pantalla de inicio
+                    } else {
+                        errorMessage = "Usuario o contraseña incorrectos."
+                    }
+                }) {
+                    Text(text = "Iniciar sesión")
                 }
-            }) {
-                Text(text = "Iniciar sesión")
-            }
 
-            Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
-            Button(onClick = {
-                if (username == storedUsername) {
-                    showDialog = true
-                    errorMessage = ""
-                } else {
-                    errorMessage = "Usuario no válido para cambiar la contraseña."
+                Button(onClick = {
+                    if (username == storedUsername) {
+                        showDialog = true
+                        errorMessage = ""
+                    } else {
+                        errorMessage = "Usuario no válido para cambiar la contraseña."
+                    }
+                }) {
+                    Text(text = "Cambiar contraseña")
                 }
-            }) {
-                Text(text = "Cambiar contraseña")
             }
         }
 
         Spacer(modifier = Modifier.weight(1f))
-    }
-
-    // 🔹 Diálogo para cambiar contraseña
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text(text = "Cambiar contraseña") },
-            text = {
-                Column {
-                    Text(text = "Ingrese su nueva contraseña:")
-                    OutlinedTextField(
-                        value = newPassword,
-                        onValueChange = { newPassword = it },
-                        label = { Text("Nueva Contraseña") },
-                        visualTransformation = if (newPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        singleLine = true,
-                        trailingIcon = {
-                            IconButton(onClick = { newPasswordVisible = !newPasswordVisible }) {
-                                Icon(
-                                    imageVector = if (newPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                    contentDescription = if (newPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
-                                )
-                            }
-                        }
-                    )
-                }
-            },
-            confirmButton = {
-                Button(onClick = {
-                    if (newPassword.isNotBlank()) {
-                        storedPassword = newPassword
-                        errorMessage = "Contraseña actualizada con éxito."
-                        showDialog = false
-                    } else {
-                        errorMessage = "La nueva contraseña no puede estar vacía."
-                    }
-                }) {
-                    Text("Guardar")
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showDialog = false }) {
-                    Text("Cancelar")
-                }
-            }
-        )
     }
 }
